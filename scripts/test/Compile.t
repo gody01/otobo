@@ -16,8 +16,9 @@
 # This test script does not work with Kernel::System::UnitTest::Driver.
 # __SKIP_BY_KERNEL_SYSTEM_UNITTEST_DRIVER__
 
-use v5.24.0;
+use strict;
 use warnings;
+use v5.24.0;
 use utf8;
 
 # core modules
@@ -25,6 +26,8 @@ use utf8;
 # CPAN modules
 use Test2::V0;
 use Test::Compile::Internal;
+
+# OTOBO modules
 
 my $Internal = Test::Compile::Internal->new;
 my @Dirs = qw(Kernel Custom scripts bin);
