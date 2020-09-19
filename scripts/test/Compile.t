@@ -59,7 +59,6 @@ foreach my $File ( $Internal->all_pm_files(@Dirs) ) {
 }
 
 note( 'check syntax of the Perl scripts' );
-
 foreach my $File ( $Internal->all_pl_files(@Dirs) ) {
     if ( $FailureIsAccepted{$File} ) {
         my $todo = todo "$File: $FailureIsAccepted{$File}";
@@ -95,7 +94,7 @@ note( 'check syntax of some shell scripts' );
     );
 
     if ( ! $ENV{OTOBO_RUNS_UNDER_DOCKER} ) {
-        push @ShellScripts;
+        push @ShellScripts,
             'bin/Cron.sh';
     }
 
