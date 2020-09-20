@@ -116,6 +116,9 @@ feature 'devel:test', 'Suppport for devel:test' => sub {
     # basic test functions
     requires 'Test2::Suite';
 
+    # testing PSGI apps and URLs
+    requires 'Test2::Tools::HTTP';
+
 };
 
 feature 'div:bcrypt', 'Suppport for div:bcrypt' => sub {
@@ -316,6 +319,9 @@ feature 'optional', 'Suppport for optional' => sub {
 
     # basic test functions
     requires 'Test2::Suite';
+
+    # testing PSGI apps and URLs
+    requires 'Test2::Tools::HTTP';
 
     # a web framework that makes web development fun again
     requires 'Mojolicious';
