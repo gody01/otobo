@@ -18,7 +18,7 @@ use strict;
 use warnings;
 
 # Set up the test driver $Self when we are running as a standalone script.
-use if __PACKAGE__ ne 'Kernel::System::UnitTest::Driver', 'Kernel::System::UnitTest::RegisterDriver';
+use Kernel::System::UnitTest::RegisterDriver;
 
 use vars (qw($Self));
 
@@ -37,7 +37,7 @@ $Self->Is( ref $Kernel::OM, 'Kernel::System::ObjectManager', 'object manager is 
 # get config object
 my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
 
-# depending on the config some missing module can be ignores
+# depending on the config some missing modules can be ignored
 my $SkipCryptSMIME;
 if ( !$ConfigObject->Get('SMIME') ) {
     $SkipCryptSMIME = 1;
@@ -184,4 +184,4 @@ $Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
 
 $Self->DoneTesting();
 
-1;
+

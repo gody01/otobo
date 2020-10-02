@@ -18,14 +18,16 @@ use strict;
 use warnings;
 use utf8;
 
-# Set up the test driver $Self when we are running as a standalone script.
-use if __PACKAGE__ ne 'Kernel::System::UnitTest::Driver', 'Kernel::System::UnitTest::RegisterDriver';
+use Test2::V0;
 
-use vars (qw($Self));
+# Set up the test driver $Self when we are running as a standalone script.
+use Kernel::System::UnitTest::RegisterDriver;
+
+our $Self;
 
 use Kernel::System::VariableCheck qw(:all);
 
-$Self->Plan( Tests => 7 );
+plan( 7 );
 
 $Kernel::OM->ObjectParamAdd(
     'Kernel::System::UnitTest::Helper' => {
@@ -328,5 +330,3 @@ $TicketObject->TicketPendingTimeSet(
 }
 
 $HelperObject->FixedTimeUnset();
-
-1;

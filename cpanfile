@@ -116,6 +116,9 @@ feature 'devel:test', 'Suppport for devel:test' => sub {
     # basic test functions
     requires 'Test2::Suite';
 
+    # contains Test2::API which is used in Kernel::System::UnitTest::Driver
+    requires 'Test::Simple';
+
     # testing PSGI apps and URLs
     requires 'Test2::Tools::HTTP';
 
@@ -319,6 +322,9 @@ feature 'optional', 'Suppport for optional' => sub {
 
     # basic test functions
     requires 'Test2::Suite';
+
+    # contains Test2::API which is used in Kernel::System::UnitTest::Driver
+    requires 'Test::Simple';
 
     # testing PSGI apps and URLs
     requires 'Test2::Tools::HTTP';

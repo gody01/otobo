@@ -19,10 +19,12 @@ use strict;
 use warnings;
 use utf8;
 
-# Set up the test driver $Self when we are running as a standalone script.
-use if __PACKAGE__ ne 'Kernel::System::UnitTest::Driver', 'Kernel::System::UnitTest::RegisterDriver';
+use Test2::V0;
 
-use vars (qw($Self));
+# Set up the test driver $Self when we are running as a standalone script.
+use Kernel::System::UnitTest::RegisterDriver;
+
+our $Self;
 
 # set up object properties
 $Kernel::OM->ObjectParamAdd(
@@ -58,7 +60,7 @@ my $TestUserID3 = $UserObject->UserLookup(
 );
 
 # plan for two tests per user and child
-$Self->Plan( Tests => 2 * 3 * $ChildCount );
+plan( 2 * 3 * $ChildCount );
 
 my $FileBase = << 'EOF';
 # OTOBO config file (automatically generated)
@@ -184,4 +186,4 @@ for my $TargetUserID ( $TestUserID1, $TestUserID2, $TestUserID3 ) {
     );
 }
 
-1;
+

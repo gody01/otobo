@@ -984,6 +984,18 @@ my @NeededModules = (
         },
     },
     {
+        Module    => 'Test::Simple',
+        Required  => 0,
+        Features   => ['devel:test'],
+        Comment   => 'contains Test2::API which is used in Kernel::System::UnitTest::Driver',
+        InstTypes => {
+            aptget => undef,
+            emerge => undef,
+            zypper => undef,
+            ports  => undef,
+        },
+    },
+    {
         Module    => 'Test2::Tools::HTTP',
         Required  => 0,
         Features   => ['devel:test'],

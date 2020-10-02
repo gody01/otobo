@@ -13,9 +13,6 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 # --
 
-# This test script does not work with Kernel::System::UnitTest::Driver.
-# __SKIP_BY_KERNEL_SYSTEM_UNITTEST_DRIVER__
-
 use strict;
 use warnings;
 use v5.24.0;
@@ -89,13 +86,10 @@ note( 'look at Perl code with an unusual extension' );
 
 note( 'check syntax of some shell scripts' );
 {
-    my @ShellScripts = (
-        'bin/docker/entrypoint.sh',
-    );
+    my @ShellScripts = glob 'bin/docker/*.sh';
 
     if ( ! $ENV{OTOBO_RUNS_UNDER_DOCKER} ) {
-        push @ShellScripts,
-            'bin/Cron.sh';
+        push @ShellScripts, 'bin/Cron.sh';
     }
 
     for my $File ( @ShellScripts ) {

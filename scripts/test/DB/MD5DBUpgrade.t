@@ -19,9 +19,12 @@ use warnings;
 use utf8;
 
 # Set up the test driver $Self when we are running as a standalone script.
-use if __PACKAGE__ ne 'Kernel::System::UnitTest::Driver', 'Kernel::System::UnitTest::RegisterDriver';
+use Kernel::System::UnitTest::RegisterDriver;
 
 use vars (qw($Self));
+
+# Test the MD5 function in MySQL and in PostgreSQL
+# Implicitly this script also tests Kernel::System::Main::MD5sum.
 
 # get needed objects
 my $DBObject   = $Kernel::OM->Get('Kernel::System::DB');
@@ -62,12 +65,10 @@ for ( 1 .. 10_000 ) {
             . ' VALUES ( ? )',
         Bind => [ \$RandomString ],
     );
-    last INSERT if !$Success;
+
+    last INSERT unless $Success;
 }
-$Self->True(
-    $Success,
-    'INSERT ok',
-);
+$Self->True( $Success, '10000 INSERTs ok');
 
 # conversion to MD5
 if (
@@ -118,13 +119,11 @@ my $Result = 1;
 RESULT:
 while ( my @Row = $DBObject->FetchrowArray() ) {
     next RESULT if $Row[1] eq $MessageIDs{ $Row[0] };
+
     $Result = 0;
 }
 
-$Self->True(
-    $Result,
-    'Conversion result',
-);
+$Self->True( $Result, 'Conversion result' );
 
 # cleanup
 $Self->True(
@@ -134,4 +133,4 @@ $Self->True(
 
 $Self->DoneTesting();
 
-1;
+

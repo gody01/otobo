@@ -19,10 +19,18 @@ package Kernel::System::Console::Command::Maint::Ticket::EscalationIndexRebuild;
 
 use strict;
 use warnings;
-
-use Time::HiRes();
+use v5.24;
+use utf8;
+use namespace::autoclean;
 
 use parent qw(Kernel::System::Console::BaseCommand);
+
+# core modules
+use Time::HiRes();
+
+# CPAN modules
+
+# OTOBO modules
 
 our @ObjectDependencies = (
     'Kernel::Config',
@@ -48,17 +56,19 @@ sub Configure {
 }
 
 sub Run {
-    my ( $Self, %Param ) = @_;
+    my $Self = shift;
+    my %Param = @_;
 
     $Self->Print("<yellow>Rebuilding ticket escalation index...</yellow>\n");
 
     # disable ticket events
     $Kernel::OM->Get('Kernel::Config')->{'Ticket::EventModulePost'} = {};
 
+    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+
     # get all tickets
-    my @TicketIDs = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+    my @TicketIDs = $TicketObject->TicketSearch(
         Result     => 'ARRAY',
-        States     => $Kernel::OM->Get('Kernel::Config')->Get('EscalationSuspendStates'),
         Limit      => 100_000_000,
         UserID     => 1,
         Permission => 'ro',
@@ -72,9 +82,8 @@ sub Run {
 
         $Count++;
 
-        $Kernel::OM->Get('Kernel::System::Ticket')->TicketEscalationIndexBuild(
+        $TicketObject->TicketEscalationIndexBuild(
             TicketID => $TicketID,
-            Suspend  => 1,
             UserID   => 1,
         );
 
@@ -89,6 +98,7 @@ sub Run {
     }
 
     $Self->Print("<green>Done.</green>\n");
+
     return $Self->ExitCodeOk();
 }
 
