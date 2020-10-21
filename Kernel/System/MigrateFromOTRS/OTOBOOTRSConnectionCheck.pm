@@ -22,7 +22,6 @@ use warnings;
 use parent qw(Kernel::System::MigrateFromOTRS::Base);
 
 our @ObjectDependencies = (
-    'Kernel::Language',
     'Kernel::Config',
     'Kernel::System::Cache',
     'Kernel::System::DateTime',
@@ -32,6 +31,20 @@ our @ObjectDependencies = (
 =head1 NAME
 
 Kernel::System::MigrateFromOTRS::OTOBOOTRSConnectionCheck - Checks required framework version for update.
+
+=head1 SYNOPSIS
+
+    # to be called from L<Kernel::Modules::MigrateFromOTRS>.
+
+=head1 PUBLIC INTERFACE
+
+=head2 CheckPreviousRequirement()
+
+check for initial conditions for running this migration step.
+
+Returns 1 on success.
+
+    my $RequirementIsMet = $MigrateFromOTRSObject->CheckPreviousRequirement();
 
 =cut
 
@@ -47,7 +60,7 @@ check for initial conditions for running this migration step.
 
 Returns 1 on success
 
-    my $Result = $DBUpdateTo6Object->Run();
+    my $Result = $MigrateFromOTRSObject->Run();
 
 =cut
 
@@ -157,18 +170,20 @@ sub Run {
 sub _CheckOTOBOVersion {
     my ( $Self, %Param ) = @_;
 
-    my %Result;
     my $OTOBOHome = $Kernel::OM->Get('Kernel::Config')->Get('Home');
 
     # load Kernel/Config.pm file
     if ( !-e "$OTOBOHome/Kernel/Config.pm" ) {
+        my %Result;
         $Result{Message}    = $Self->{LanguageObject}->Translate("Check if OTOBO version is correct.");
         $Result{Comment}    = $Self->{LanguageObject}->Translate( '%s does not exist!', "$OTOBOHome/Kernel/Config.pm" );
         $Result{Successful} = 0;
+
         return \%Result;
     }
 
     # Everything if correct, return 1
+    my %Result;
     $Result{Message}    = $Self->{LanguageObject}->Translate("Check if OTOBO version is correct.");
     $Result{Comment}    = $Self->{LanguageObject}->Translate("OTOBO Home exists.");
     $Result{Successful} = 1;
@@ -229,36 +244,38 @@ sub _CheckConfigpmAndWriteCache {
     my %CacheOptions;
 
     ## no critic
-    open( my $In, '<', $ConfigFile )
-        || return "Can't open $ConfigFile: $!";
+    {
+        open( my $In, '<', $ConfigFile )
+            or return "Can't open $ConfigFile: $!";
 
-    CONFIGLINE:
-    while (<$In>) {
+        CONFIGLINE:
+        while (<$In>) {
 
-        # Search config option value and save in %CacheOptions{CacheKey} => ConfigOption
-        if (/^\s*\$Self->\{['"\s]*(\w+)['"\s]*\}\s*=\s*['"](.+)['"]\s*;/) {
-            for my $Key ( sort keys %COptions ) {
-                if ( lc($1) eq lc($Key) ) {
-                    $CacheOptions{ $COptions{$Key} } = $2;
-                    next CONFIGLINE;
+            # Search config option value and save in %CacheOptions{CacheKey} => ConfigOption
+            if ( m/^\s*\$Self->\{['"\s]*(\w+)['"\s]*\}\s*=\s*['"](.+)['"]\s*;/ ) {
+                for my $Key ( sort keys %COptions ) {
+                    if ( lc($1) eq lc($Key) ) {
+                        $CacheOptions{ $COptions{$Key} } = $2;
+
+                        next CONFIGLINE;
+                    }
                 }
             }
         }
     }
-    close $In;
 
     # Extract driver to load for install test.
-    my ($DBType) = ( $CacheOptions{DBDSN} =~ /^DBI:(.*?):/ );
+    my ($DBType) = $CacheOptions{DBDSN} =~ m/^DBI:(.*?):/;
 
-    if ( $DBType =~ /mysql/ ) {
+    if ( $DBType =~ m/mysql/ ) {
         $CacheOptions{DBType} = 'mysql';
     }
-    elsif ( $DBType =~ /Pg/ ) {
+    elsif ( $DBType =~ m/Pg/ ) {
         $CacheOptions{DBType} = 'postgresql';
     }
     elsif ( $DBType =~ /Oracle/ ) {
         $CacheOptions{DBType} = 'oracle';
-        $CacheOptions{DBPort} = ( $CacheOptions{DBDSN} =~ /^DBI:.*:(\d+)/ );
+        $CacheOptions{DBPort} = ( $CacheOptions{DBDSN} =~ m/^DBI:.*:(\d+)/ );
     }
 
     $CacheObject->Set(
@@ -266,7 +283,7 @@ sub _CheckConfigpmAndWriteCache {
         Key   => 'OTRSDBSettings',
         Value => {
             DBType     => $CacheOptions{DBType},
-            DBHost     => $CacheOptions{DBHost},
+            DBHost     => $CacheOptions{DBHost},   # usually needs to be adapted when running under Docker
             DBUser     => $CacheOptions{DBUser},
             DBPassword => $CacheOptions{DBPassword},
             DBName     => $CacheOptions{DBName},

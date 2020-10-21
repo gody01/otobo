@@ -17,6 +17,8 @@
 
 use strict;
 use warnings;
+use v5.24;
+use utf8;
 
 # use ../../ as lib location
 use FindBin qw($Bin);
@@ -39,5 +41,7 @@ local $Kernel::OM = Kernel::System::ObjectManager->new();
 my $Debug = 0;
 
 # do the work and give the response to the webserver
-my $Interface = Kernel::System::Web::InterfaceMigrateFromOTRS->new( Debug => $Debug );
-print $Interface->HeaderAndContent();
+print
+    Kernel::System::Web::InterfaceMigrateFromOTRS->new(
+        Debug => $Debug
+    )->HeaderAndContent();
